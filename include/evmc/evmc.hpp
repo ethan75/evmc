@@ -549,6 +549,7 @@ public:
     {
         host->emit_log(context, &addr, data, data_size, topics, topics_count);
     }
+    evmc_host_context* get_host_context() const noexcept { return context; }
 };
 
 
@@ -839,4 +840,5 @@ struct hash<evmc::bytes32>
                        load64be(&s.bytes[24])));
     }
 };
+
 }  // namespace std
