@@ -599,6 +599,7 @@ public:
     {
         return host->access_storage(context, &address, &key);
     }
+    evmc_host_context* get_host_context() const noexcept { return context; }
 };
 
 
@@ -921,4 +922,5 @@ struct hash<evmc::bytes32>
                        load64le(&s.bytes[24])));
     }
 };
+
 }  // namespace std
