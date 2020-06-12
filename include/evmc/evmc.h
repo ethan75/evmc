@@ -1116,6 +1116,28 @@ struct evmc_vm
     evmc_set_option_fn set_option;
 };
 
+struct evmc_gas_metrics
+{
+    int16_t createGas;
+    int16_t sstoreSetGas;
+    int16_t sstoreResetGas;
+    int16_t sloadGas;
+    int16_t valueTransferGas;
+    int16_t callStipend;
+    int16_t callNewAccount;
+};
+/**
+ * @struct evmc_host_context
+ * The opaque data type representing the Host execution context.
+ * @see evmc_execute_fn().
+ */
+struct evmc_host_context
+{
+    const struct evmc_host_interface* interface;
+    evmc_bytes32 (*sm3_hash_fn)(const uint8_t* data, size_t size);
+    uint32_t version;
+    const struct evmc_gas_metrics* metrics;
+};
 /* END Python CFFI declarations */
 
 #ifdef EVMC_DOCUMENTATION
