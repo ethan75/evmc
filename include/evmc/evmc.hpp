@@ -415,7 +415,7 @@ public:
     /// @copydoc evmc_host_interface::set_storage
     virtual evmc_storage_status set_storage(const address& addr,
                                             const bytes32& key,
-                                            const bytes32& value) noexcept = 0;
+                                            const bytes32& value) = 0;
 
     /// @copydoc evmc_host_interface::get_balance
     virtual uint256be get_balance(const address& addr) const noexcept = 0;
@@ -485,7 +485,7 @@ public:
 
     evmc_storage_status set_storage(const address& address,
                                     const bytes32& key,
-                                    const bytes32& value) noexcept final
+                                    const bytes32& value) final
     {
         return host->set_storage(context, &address, &key, &value);
     }
