@@ -526,6 +526,18 @@ public:
         return host->set_storage(context, &address, &key, &value);
     }
 
+    virtual int32_t get(const evmc_address& address, const char* _key, int32_t _keyLength,
+                char* _value, int32_t _valueLength) const noexcept final
+    {
+        return host->get(context, &address, _key, _keyLength, _value, _valueLength);
+    }
+
+    virtual evmc_storage_status set(const address& address, const char* _key, int32_t _keyLength,
+                            const char* _value, int32_t _valueLength) final
+    {
+        return host->set(context, &address, _key, _keyLength, _value, _valueLength);
+    }
+
     uint256be get_balance(const address& address) const noexcept final
     {
         return host->get_balance(context, &address);
