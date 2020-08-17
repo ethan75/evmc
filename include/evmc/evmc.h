@@ -449,6 +449,12 @@ typedef evmc_bytes32 (*evmc_get_storage_fn)(struct evmc_host_context* context,
                                             const evmc_address* address,
                                             const evmc_bytes32* key);
 
+typedef int32_t (*evmc_get_fn)(struct evmc_host_context* context,
+                                            const evmc_address* address,
+                                            const char* _key,
+                                            int32_t _keyLength,
+                                            char* _value,
+                                            int32_t _valueLength);
 
 /**
  * The effect of an attempt to modify a contract storage item.
@@ -508,6 +514,12 @@ typedef enum evmc_storage_status (*evmc_set_storage_fn)(struct evmc_host_context
                                                         const evmc_address* address,
                                                         const evmc_bytes32* key,
                                                         const evmc_bytes32* value);
+typedef enum evmc_storage_status (*evmc_set_fn)(struct evmc_host_context* context,
+                                            const evmc_address* address,
+                                            const char* _key,
+                                            int32_t _keyLength,
+                                            const char* _value,
+                                            int32_t _valueLength);
 
 /**
  * Get balance callback function.
@@ -660,6 +672,9 @@ struct evmc_host_interface
 
     /** Emit log callback function. */
     evmc_emit_log_fn emit_log;
+
+    evmc_get_fn get;
+    evmc_set_fn set;
 };
 
 
