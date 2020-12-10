@@ -507,11 +507,11 @@ typedef evmc_bytes32 (*evmc_get_storage_fn)(struct evmc_host_context* context,
                                             const evmc_bytes32* key);
 
 typedef int32_t (*evmc_get_fn)(struct evmc_host_context* context,
-                                            const evmc_address* address,
-                                            const char* _key,
-                                            int32_t _keyLength,
-                                            char* _value,
-                                            int32_t _valueLength);
+                               const evmc_address* address,
+                               const char* _key,
+                               int32_t _keyLength,
+                               char* _value,
+                               int32_t _valueLength);
 
 /**
  * The effect of an attempt to modify a contract storage item.
@@ -629,11 +629,58 @@ typedef enum evmc_storage_status (*evmc_set_storage_fn)(struct evmc_host_context
                                                         const evmc_bytes32* key,
                                                         const evmc_bytes32* value);
 typedef enum evmc_storage_status (*evmc_set_fn)(struct evmc_host_context* context,
-                                            const evmc_address* address,
-                                            const char* _key,
-                                            int32_t _keyLength,
-                                            const char* _value,
-                                            int32_t _valueLength);
+                                                const evmc_address* address,
+                                                const char* key,
+                                                int32_t keyLength,
+                                                const char* value,
+                                                int32_t valueLength);
+
+typedef bool (*evmc_register_asset_fn)(struct evmc_host_context* context,
+                                       const char* assetName,
+                                       int32_t assetNameLength,
+                                       const evmc_address* issuer,
+                                       bool fungible,
+                                       uint64_t total,
+                                       const char* description,
+                                       int32_t descriptionLength);
+
+typedef bool (*evmc_issue_fungible_asset_fn)(struct evmc_host_context* context,
+                                             const evmc_address* to,
+                                             const char* assetName,
+                                             int32_t assetNameLength,
+                                             uint64_t amount);
+
+typedef uint64_t (*evmc_issue_not_fungible_asset_fn)(struct evmc_host_context* context,
+                                                     const evmc_address* to,
+                                                     const char* assetName,
+                                                     int32_t assetNameLength,
+                                                     const char* uri,
+                                                     int32_t uriLength);
+
+typedef bool (*evmc_transfer_asset_fn)(struct evmc_host_context* context,
+                                       const evmc_address* to,
+                                       const char* assetName,
+                                       int32_t assetNameLength,
+                                       uint64_t amountOrID,
+                                       bool fromSelf);
+typedef uint64_t (*evmc_get_asset_balance_fn)(struct evmc_host_context* context,
+                                              const evmc_address* to,
+                                              const char* assetName,
+                                              int32_t assetNameLength);
+
+typedef int32_t (*evmc_get_asset_ids_fn)(struct evmc_host_context* context,
+                                         const evmc_address* to,
+                                         const char* assetName,
+                                         int32_t assetNameLength,
+                                         char* value,
+                                         int32_t valueLength);
+typedef int32_t (*evmc_get_not_fungible_asset_info_fn)(struct evmc_host_context* context,
+                                                       const evmc_address* to,
+                                                       const char* assetName,
+                                                       int32_t assetNameLength,
+                                                       uint64_t assetID,
+                                                       char* value,
+                                                       int32_t valueLength);
 
 /**
  * Get balance callback function.
@@ -842,6 +889,13 @@ struct evmc_host_interface
     evmc_access_storage_fn access_storage;
     evmc_get_fn get;
     evmc_set_fn set;
+    evmc_register_asset_fn register_asset;
+    evmc_issue_fungible_asset_fn issue_fungible_asset;
+    evmc_issue_not_fungible_asset_fn issue_not_fungible_asset;
+    evmc_transfer_asset_fn transfer_asset;
+    evmc_get_asset_balance_fn get_asset_balance;
+    evmc_get_not_fungible_asset_info_fn get_not_fungible_asset_info;
+    evmc_get_asset_ids_fn get_asset_ids;
 };
 
 
