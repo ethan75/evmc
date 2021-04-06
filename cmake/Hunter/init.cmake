@@ -6,6 +6,7 @@
 # Hunter is going to be initialized only if building with tests,
 # where it is needed to get dependencies.
 HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.24.3.tar.gz"
-    SHA1 "10738b59e539818a01090e64c2d09896247530c7"
+    URL "https://github.com/FISCO-BCOS/hunter/archive/da73ad5a35aaee05b9feb77671c744487979c611.tar.gz"
+    SHA1 "9bfa9577907f31a2e064a986c423651dd29e2a45"
+    LOCAL
 )
