@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EVMC: Ethereum Client-VM Connector API
  *
  * @copyright
@@ -130,6 +130,8 @@ struct evmc_message
      * Defined as `r` in the Yellow Paper.
      */
     evmc_address recipient;
+    const uint8_t* destination_ptr;
+    size_t destination_len;
 
     /**
      * The sender of the message.
@@ -140,6 +142,8 @@ struct evmc_message
      * At the depth 0 this must be the transaction origin.
      */
     evmc_address sender;
+    const uint8_t* sender_ptr;
+    size_t sender_len;
 
     /**
      * The message input data.
