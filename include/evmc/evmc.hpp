@@ -530,14 +530,14 @@ public:
         return host->set_storage(context, &address, &key, &value);
     }
 
-    virtual int32_t get(const char* _address, int32_t _addressLength, const char* _key, int32_t _keyLength,
-                char* _value, int32_t _valueLength) const noexcept final
+    virtual int32_t get(const uint8_t* _address, int32_t _addressLength, const uint8_t* _key, int32_t _keyLength,
+                uint8_t* _value, int32_t _valueLength) const noexcept final
     {
         return context->wasm_interface->get_storage(context, _address, _addressLength, _key, _keyLength, _value, _valueLength);
     }
 
-    virtual evmc_storage_status set(const char* _address, int32_t _addressLength, const char* _key, int32_t _keyLength,
-                            const char* _value, int32_t _valueLength) final
+    virtual evmc_storage_status set(const uint8_t* _address, int32_t _addressLength, const uint8_t* _key, int32_t _keyLength,
+                            const uint8_t* _value, int32_t _valueLength) final
     {
         return context->wasm_interface->set_storage(context, _address, _addressLength, _key, _keyLength, _value, _valueLength);
     }

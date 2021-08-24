@@ -719,32 +719,32 @@ struct evmc_host_interface
 
 // wasm host interface
 typedef bool (*wasm_account_exists_fn)(struct evmc_host_context* context,
-                                       const char* address, int32_t addressLength);
+                                       const uint8_t* address, int32_t addressLength);
 typedef enum evmc_storage_status (*wasm_set_storage_fn)(struct evmc_host_context* context,
-                                                const char* address,
+                                                const uint8_t* address,
                                                 int32_t addressLength,
-                                                const char* key,
+                                                const uint8_t* key,
                                                 int32_t keyLength,
-                                                const char* value,
+                                                const uint8_t* value,
                                                 int32_t valueLength);
-typedef int32_t (*wasm_get_storage_fn)(struct evmc_host_context* context, const char* address,
-                                int32_t addressLength, const char* _key, int32_t _keyLength,
-                                char* _value, int32_t _valueLength);
+typedef int32_t (*wasm_get_storage_fn)(struct evmc_host_context* context, const uint8_t* address,
+                                int32_t addressLength, const uint8_t* _key, int32_t _keyLength,
+                                uint8_t* _value, int32_t _valueLength);
 
 typedef size_t (*wasm_get_code_size_fn)(struct evmc_host_context* context,
-                                        const char* address, int32_t addressLength);
+                                        const uint8_t* address, int32_t addressLength);
 
 typedef evmc_bytes32 (*wasm_get_code_hash_fn)(struct evmc_host_context* context,
-                                              const char* address, int32_t addressLength);
+                                              const uint8_t* address, int32_t addressLength);
 
 typedef size_t (*wasm_copy_code_fn)(struct evmc_host_context* context,
-                                    const char* address, int32_t addressLength,
+                                    const uint8_t* address, int32_t addressLength,
                                     size_t code_offset,
                                     uint8_t* buffer_data,
                                     size_t buffer_size);
 
 typedef void (*wasm_emit_log_fn)(struct evmc_host_context* context,
-                                 const char* address, int32_t addressLength,
+                                 const uint8_t* address, int32_t addressLength,
                                  const uint8_t* data,
                                  size_t data_size,
                                  const evmc_bytes32 topics[],
@@ -760,39 +760,39 @@ typedef bool (*wasm_register_asset_fn)(struct evmc_host_context* context,
                                        int32_t descriptionLength);
 
 typedef bool (*wasm_issue_fungible_asset_fn)(struct evmc_host_context* context,
-                                             const char* address, int32_t addressLength,
+                                             const uint8_t* address, int32_t addressLength,
                                              const char* assetName,
                                              int32_t assetNameLength,
                                              uint64_t amount);
 
 typedef uint64_t (*wasm_issue_not_fungible_asset_fn)(struct evmc_host_context* context,
-                                                     const char* address, int32_t addressLength,
+                                                     const uint8_t* address, int32_t addressLength,
                                                      const char* assetName,
                                                      int32_t assetNameLength,
                                                      const char* uri,
                                                      int32_t uriLength);
 
 typedef bool (*wasm_transfer_asset_fn)(struct evmc_host_context* context,
-                                       const char* address, int32_t addressLength,
+                                       const uint8_t* address, int32_t addressLength,
                                        const char* assetName,
                                        int32_t assetNameLength,
                                        uint64_t amountOrID,
                                        bool fromSelf);
 
 typedef uint64_t (*wasm_get_asset_balance_fn)(struct evmc_host_context* context,
-                                              const char* address, int32_t addressLength,
+                                              const uint8_t* address, int32_t addressLength,
                                               const char* assetName,
                                               int32_t assetNameLength);
 
 typedef int32_t (*wasm_get_asset_ids_fn)(struct evmc_host_context* context,
-                                         const char* address, int32_t addressLength,
+                                         const uint8_t* address, int32_t addressLength,
                                          const char* assetName,
                                          int32_t assetNameLength,
                                          char* value,
                                          int32_t valueLength);
 
 typedef int32_t (*wasm_get_not_fungible_asset_info_fn)(struct evmc_host_context* context,
-                                                       const char* address, int32_t addressLength,
+                                                       const uint8_t* address, int32_t addressLength,
                                                        const char* assetName,
                                                        int32_t assetNameLength,
                                                        uint64_t assetID,
