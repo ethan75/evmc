@@ -131,7 +131,7 @@ struct evmc_message
      */
     evmc_address recipient;
     const uint8_t* destination_ptr;
-    size_t destination_len;
+    int32_t destination_len;
 
     /**
      * The sender of the message.
@@ -143,7 +143,7 @@ struct evmc_message
      */
     evmc_address sender;
     const uint8_t* sender_ptr;
-    size_t sender_len;
+    int32_t sender_len;
 
     /**
      * The message input data.
