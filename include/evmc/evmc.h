@@ -1051,6 +1051,7 @@ struct evmc_host_context
     const struct evmc_host_interface* interface;
     const struct wasm_host_interface* wasm_interface;
     evmc_bytes32 (*hash_fn)(const uint8_t* data, size_t size);
+    bool isSMCrypto;
     uint32_t version;
     const struct evmc_gas_metrics* metrics;
 };
