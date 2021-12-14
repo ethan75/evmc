@@ -162,7 +162,7 @@ impl VMMetaData {
                     "evm" => ret |= 1,
                     "ewasm" => ret |= 1 << 1,
                     "precompiles" => ret |= 1 << 2,
-                    "fbwasm" => ret |= 1 << 3,
+                    "fbwasm" => ret |= 1 << 8,
                     _ => panic!("Invalid capability specified."),
                 }
             }
