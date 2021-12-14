@@ -1020,7 +1020,9 @@ enum evmc_capabilities
      *
      * This capability is **experimental** and MAY be removed without notice.
      */
-    EVMC_CAPABILITY_PRECOMPILES = (1u << 2)
+    EVMC_CAPABILITY_PRECOMPILES = (1u << 2),
+
+    EVMC_CAPABILITY_FBWASM = (1u << 8)
 };
 
 /**
