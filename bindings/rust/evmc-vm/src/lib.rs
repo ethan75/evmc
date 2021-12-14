@@ -13,6 +13,7 @@ mod types;
 
 pub use container::EvmcContainer;
 pub use evmc_sys as ffi;
+use ffi::evmc_address;
 pub use types::*;
 
 /// Trait EVMC VMs have to implement.
@@ -45,8 +46,10 @@ pub struct ExecutionMessage {
     flags: u32,
     depth: i32,
     gas: i64,
-    destination: Address,
-    sender: Address,
+    // destination: Address,
+    destination: Vec<u8>,
+    // sender: Address,
+    sender: Vec<u8>,
     input: Option<Vec<u8>>,
     value: Uint256,
     create2_salt: Bytes32,
@@ -121,8 +124,8 @@ impl ExecutionMessage {
         flags: u32,
         depth: i32,
         gas: i64,
-        destination: Address,
-        sender: Address,
+        destination: &Vec<u8>,
+        sender: &Vec<u8>,
         input: Option<&[u8]>,
         value: Uint256,
         create2_salt: Bytes32,
@@ -132,8 +135,8 @@ impl ExecutionMessage {
             flags,
             depth,
             gas,
-            destination,
-            sender,
+            destination: destination.to_vec(),
+            sender : sender.to_vec(),
             input: if let Some(input) = input {
                 Some(input.to_vec())
             } else {
@@ -164,14 +167,24 @@ impl ExecutionMessage {
         self.gas
     }
 
-    /// Read the destination address of the message.
-    pub fn destination(&self) -> &Address {
-        &self.destination
+    /// Read the pointer of destination address of the message, because liquid use string as address.
+    pub fn destination(&self) -> &Vec<u8> {
+        self.destination.as_ref()
     }
 
-    /// Read the sender address of the message.
-    pub fn sender(&self) -> &Address {
-        &self.sender
+    /// Read the length of destination address of the message.
+    pub fn destination_len(&self) -> i32 {
+        self.destination.len() as i32
+    }
+
+    /// Read the pointer of sender address of the message, because liquid use string as address.
+    pub fn sender(&self) -> &Vec<u8> {
+        self.sender.as_ref()
+    }
+
+    /// Read the length of sender address of the message.
+    pub fn sender_len(&self) -> i32 {
+        self.sender.len() as i32
     }
 
     /// Read the optional input message.
@@ -320,8 +333,12 @@ impl<'a> ExecutionContext<'a> {
             flags: message.flags(),
             depth: message.depth(),
             gas: message.gas(),
-            destination: *message.destination(),
-            sender: *message.sender(),
+            destination: evmc_address::default(),
+            destination_ptr: message.destination().as_ptr(),
+            destination_len: message.destination_len(),
+            sender: evmc_address::default(),
+            sender_ptr: message.sender().as_ptr(),
+            sender_len: message.sender_len(),
             input_data: input_data,
             input_size: input_size,
             value: *message.value(),
@@ -483,8 +500,22 @@ impl From<&ffi::evmc_message> for ExecutionMessage {
             flags: message.flags,
             depth: message.depth,
             gas: message.gas,
-            destination: message.destination,
-            sender: message.sender,
+            destination: if message.destination_ptr.is_null() {
+                assert_eq!(message.destination_len, 0);
+                Vec::new()
+            } else if message.destination_len == 0 {
+                Vec::new()
+            } else {
+                from_buf_raw::<u8>(message.destination_ptr, message.destination_len as usize)
+            },
+            sender: if message.sender_ptr.is_null() {
+                assert_eq!(message.sender_len, 0);
+                Vec::new()
+            } else if message.sender_len == 0 {
+                Vec::new()
+            } else {
+                from_buf_raw::<u8>(message.sender_ptr, message.sender_len as usize)
+            },
             input: if message.input_data.is_null() {
                 assert_eq!(message.input_size, 0);
                 None
@@ -649,8 +680,8 @@ mod tests {
     #[test]
     fn message_new_with_input() {
         let input = vec![0xc0, 0xff, 0xee];
-        let destination = Address { bytes: [32u8; 20] };
-        let sender = Address { bytes: [128u8; 20] };
+        let destination = vec![32u8; 20];
+        let sender = vec![128u8; 20];
         let value = Uint256 { bytes: [0u8; 32] };
         let create2_salt = Bytes32 { bytes: [255u8; 32] };
 
@@ -659,8 +690,8 @@ mod tests {
             44,
             66,
             4466,
-            destination,
-            sender,
+            &destination,
+            &sender,
             Some(&input),
             value,
             create2_salt,
@@ -680,8 +711,8 @@ mod tests {
 
     #[test]
     fn message_from_ffi() {
-        let destination = Address { bytes: [32u8; 20] };
-        let sender = Address { bytes: [128u8; 20] };
+        let destination =vec![32u8; 20];
+        let sender = vec![128u8; 20];
         let value = Uint256 { bytes: [0u8; 32] };
         let create2_salt = Bytes32 { bytes: [255u8; 32] };
 
@@ -690,8 +721,12 @@ mod tests {
             flags: 44,
             depth: 66,
             gas: 4466,
-            destination: destination,
-            sender: sender,
+            destination: evmc_address::default(),
+            destination_ptr: destination.as_ptr(),
+            destination_len: destination.len() as i32,
+            sender: evmc_address::default(),
+            sender_ptr: sender.as_ptr(),
+            sender_len: sender.len() as i32,
             input_data: std::ptr::null(),
             input_size: 0,
             value: value,
@@ -704,8 +739,8 @@ mod tests {
         assert_eq!(ret.flags(), msg.flags);
         assert_eq!(ret.depth(), msg.depth);
         assert_eq!(ret.gas(), msg.gas);
-        assert_eq!(*ret.destination(), msg.destination);
-        assert_eq!(*ret.sender(), msg.sender);
+        assert_eq!(*ret.destination(), from_buf_raw::<u8>(msg.destination_ptr, msg.destination_len as usize));
+        assert_eq!(*ret.sender(), from_buf_raw::<u8>(msg.sender_ptr, msg.sender_len as usize));
         assert!(ret.input().is_none());
         assert_eq!(*ret.value(), msg.value);
         assert_eq!(*ret.create2_salt(), msg.create2_salt);
@@ -714,8 +749,8 @@ mod tests {
     #[test]
     fn message_from_ffi_with_input() {
         let input = vec![0xc0, 0xff, 0xee];
-        let destination = Address { bytes: [32u8; 20] };
-        let sender = Address { bytes: [128u8; 20] };
+        let destination = vec![32u8; 20];
+        let sender = vec![128u8; 20];
         let value = Uint256 { bytes: [0u8; 32] };
         let create2_salt = Bytes32 { bytes: [255u8; 32] };
 
@@ -724,8 +759,12 @@ mod tests {
             flags: 44,
             depth: 66,
             gas: 4466,
-            destination: destination,
-            sender: sender,
+            destination: evmc_address::default(),
+            destination_ptr: destination.as_ptr(),
+            destination_len: destination.len() as i32,
+            sender: evmc_address::default(),
+            sender_ptr: sender.as_ptr(),
+            sender_len: sender.len() as i32,
             input_data: input.as_ptr(),
             input_size: input.len(),
             value: value,
@@ -738,8 +777,8 @@ mod tests {
         assert_eq!(ret.flags(), msg.flags);
         assert_eq!(ret.depth(), msg.depth);
         assert_eq!(ret.gas(), msg.gas);
-        assert_eq!(*ret.destination(), msg.destination);
-        assert_eq!(*ret.sender(), msg.sender);
+        assert_eq!(*ret.destination(), from_buf_raw::<u8>(msg.destination_ptr, msg.destination_len as usize));
+        assert_eq!(*ret.sender(), from_buf_raw::<u8>(msg.sender_ptr, msg.sender_len as usize));
         assert!(ret.input().is_some());
         assert_eq!(*ret.input().unwrap(), input);
         assert_eq!(*ret.value(), msg.value);
@@ -851,7 +890,7 @@ mod tests {
     #[test]
     fn test_call_empty_data() {
         // This address is useless. Just a dummy parameter for the interface function.
-        let test_addr = Address::default();
+        let test_addr = vec![];
         let host = get_dummy_host_interface();
         let host_context = std::ptr::null_mut();
         let mut exe_context = ExecutionContext::new(&host, host_context);
@@ -861,8 +900,8 @@ mod tests {
             0,
             0,
             6566,
-            test_addr,
-            test_addr,
+            &test_addr,
+            &test_addr,
             None,
             Uint256::default(),
             Bytes32::default(),
@@ -880,7 +919,7 @@ mod tests {
     #[test]
     fn test_call_with_data() {
         // This address is useless. Just a dummy parameter for the interface function.
-        let test_addr = Address::default();
+        let test_addr = vec![];
         let host = get_dummy_host_interface();
         let host_context = std::ptr::null_mut();
         let mut exe_context = ExecutionContext::new(&host, host_context);
@@ -892,8 +931,8 @@ mod tests {
             0,
             0,
             6566,
-            test_addr,
-            test_addr,
+            &test_addr,
+            &test_addr,
             Some(&data),
             Uint256::default(),
             Bytes32::default(),
