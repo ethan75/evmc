@@ -72,12 +72,13 @@ pub struct ExecutionMessage {
 
 /// EVMC transaction context structure.
 pub type ExecutionTxContext = ffi::evmc_tx_context;
+pub type ExecutionHostContext = ffi::evmc_host_context;
 
 /// EVMC context structure. Exposes the EVMC host functions, message data, and transaction context
 /// to the executing VM.
 pub struct ExecutionContext<'a> {
     host: &'a ffi::evmc_host_interface,
-    context: *mut ffi::evmc_host_context,
+    context: *mut ExecutionHostContext,
     tx_context: ExecutionTxContext,
 }
 
@@ -159,7 +160,7 @@ impl ExecutionMessage {
             depth,
             gas,
             destination: destination.to_vec(),
-            sender : sender.to_vec(),
+            sender: sender.to_vec(),
             input: if let Some(input) = input {
                 Some(input.to_vec())
             } else {
@@ -248,6 +249,13 @@ impl<'a> ExecutionContext<'a> {
             host,
             context: _context,
             tx_context: _tx_context,
+        }
+    }
+
+    /// Retrieve the host context.
+    pub fn get_host_context(&self) -> &ExecutionHostContext {
+        unsafe {
+            self.context.as_ref().unwrap()
         }
     }
 
@@ -761,7 +769,7 @@ mod tests {
 
     #[test]
     fn message_from_ffi() {
-        let destination =vec![32u8; 20];
+        let destination = vec![32u8; 20];
         let sender = vec![128u8; 20];
         let value = Uint256 { bytes: [0u8; 32] };
         let create2_salt = Bytes32 { bytes: [255u8; 32] };
@@ -791,8 +799,14 @@ mod tests {
         assert_eq!(ret.flags(), msg.flags);
         assert_eq!(ret.depth(), msg.depth);
         assert_eq!(ret.gas(), msg.gas);
-        assert_eq!(*ret.destination(), from_buf_raw::<u8>(msg.destination_ptr, msg.destination_len as usize));
-        assert_eq!(*ret.sender(), from_buf_raw::<u8>(msg.sender_ptr, msg.sender_len as usize));
+        assert_eq!(
+            *ret.destination(),
+            from_buf_raw::<u8>(msg.destination_ptr, msg.destination_len as usize)
+        );
+        assert_eq!(
+            *ret.sender(),
+            from_buf_raw::<u8>(msg.sender_ptr, msg.sender_len as usize)
+        );
         assert!(ret.input().is_none());
         assert_eq!(*ret.value(), msg.value);
         assert_eq!(*ret.create2_salt(), msg.create2_salt);
@@ -832,8 +846,14 @@ mod tests {
         assert_eq!(ret.flags(), msg.flags);
         assert_eq!(ret.depth(), msg.depth);
         assert_eq!(ret.gas(), msg.gas);
-        assert_eq!(*ret.destination(), from_buf_raw::<u8>(msg.destination_ptr, msg.destination_len as usize));
-        assert_eq!(*ret.sender(), from_buf_raw::<u8>(msg.sender_ptr, msg.sender_len as usize));
+        assert_eq!(
+            *ret.destination(),
+            from_buf_raw::<u8>(msg.destination_ptr, msg.destination_len as usize)
+        );
+        assert_eq!(
+            *ret.sender(),
+            from_buf_raw::<u8>(msg.sender_ptr, msg.sender_len as usize)
+        );
         assert!(ret.input().is_some());
         assert_eq!(*ret.input().unwrap(), input);
         assert_eq!(*ret.value(), msg.value);
