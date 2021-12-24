@@ -61,6 +61,7 @@ pub type ExecutionHostContext = ffi::evmc_host_context;
 
 /// EVMC context structure. Exposes the EVMC host functions, message data, and transaction context
 /// to the executing VM.
+#[derive(Clone, Debug)]
 pub struct ExecutionContext<'a> {
     host: &'a ffi::evmc_host_interface,
     context: *mut ExecutionHostContext,
@@ -220,9 +221,7 @@ impl<'a> ExecutionContext<'a> {
 
     /// Retrieve the host context.
     pub fn get_host_context(&self) -> &ExecutionHostContext {
-        unsafe {
-            self.context.as_ref().unwrap()
-        }
+        unsafe { self.context.as_ref().unwrap() }
     }
 
     /// Retrieve the transaction context.
@@ -398,6 +397,107 @@ impl<'a> ExecutionContext<'a> {
                 self.context,
                 address as *const Address,
                 key as *const Bytes32,
+            )
+        }
+    }
+
+    /// WASM Check if an account exists.
+    pub fn wasm_account_exists(&self, address: &[u8]) -> bool {
+        unsafe {
+            assert!((*(*self.context).wasm_interface).account_exists.is_some());
+            (*(*self.context).wasm_interface).account_exists.unwrap()(
+                self.context,
+                address.as_ptr(),
+                address.len() as i32,
+            )
+        }
+    }
+
+    /// WASM Read from a storage key.
+    pub fn wasm_get_storage(&self, address: &[u8], key: &[u8], value: &mut [u8]) -> i32 {
+        unsafe {
+            assert!((*(*self.context).wasm_interface).get_storage.is_some());
+            (*(*self.context).wasm_interface).get_storage.unwrap()(
+                self.context,
+                address.as_ptr(),
+                address.len() as i32,
+                key.as_ptr(),
+                key.len() as i32,
+                value.as_mut_ptr(),
+                value.len() as i32,
+            )
+        }
+    }
+
+    /// WASM Set value of a storage key.
+    pub fn wasm_set_storage(&mut self, address: &[u8], key: &[u8], value: &[u8]) -> StorageStatus {
+        unsafe {
+            assert!((*(*self.context).wasm_interface).set_storage.is_some());
+            (*(*self.context).wasm_interface).set_storage.unwrap()(
+                self.context,
+                address.as_ptr(),
+                address.len() as i32,
+                key.as_ptr(),
+                key.len() as i32,
+                value.as_ptr(),
+                value.len() as i32,
+            )
+        }
+    }
+
+    /// WASM Get code size of an account.
+    pub fn wasm_get_code_size(&self, address: &[u8]) -> usize {
+        unsafe {
+            assert!((*(*self.context).wasm_interface).get_code_size.is_some());
+            (*(*self.context).wasm_interface).get_code_size.unwrap()(
+                self.context,
+                address.as_ptr(),
+                address.len() as i32,
+            )
+        }
+    }
+
+    /// WASM Get code hash of an account.
+    pub fn wasm_get_code_hash(&self, address: &[u8]) -> Bytes32 {
+        unsafe {
+            assert!((*(*self.context).wasm_interface).get_code_size.is_some());
+            (*(*self.context).wasm_interface).get_code_hash.unwrap()(
+                self.context,
+                address.as_ptr(),
+                address.len() as i32,
+            )
+        }
+    }
+
+    /// WASM Copy code of an account.
+    pub fn wasm_copy_code(&self, address: &[u8], code_offset: usize, buffer: &mut [u8]) -> usize {
+        unsafe {
+            assert!((*(*self.context).wasm_interface).copy_code.is_some());
+            (*(*self.context).wasm_interface).copy_code.unwrap()(
+                self.context,
+                address.as_ptr(),
+                address.len() as i32,
+                code_offset,
+                // FIXME: ensure that alignment of the array elements is OK
+                buffer.as_mut_ptr(),
+                buffer.len(),
+            )
+        }
+    }
+
+    /// WASM Emit a log.
+    pub fn wasm_emit_log(&mut self, address: &[u8], data: &[u8], topics: &[Bytes32]) {
+        unsafe {
+            assert!((*(*self.context).wasm_interface).emit_log.is_some());
+            (*(*self.context).wasm_interface).emit_log.unwrap()(
+                self.context,
+                address.as_ptr(),
+                address.len() as i32,
+                // FIXME: ensure that alignment of the array elements is OK
+                data.as_ptr(),
+                data.len(),
+                topics.as_ptr(),
+                topics.len(),
             )
         }
     }
