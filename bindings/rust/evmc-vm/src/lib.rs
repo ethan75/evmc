@@ -126,9 +126,9 @@ impl ExecutionMessage {
         flags: u32,
         depth: i32,
         gas: i64,
-        destination: &Vec<u8>,
-        sender: &Vec<u8>,
-        input: Option<&[u8]>,
+        destination: Vec<u8>,
+        sender: Vec<u8>,
+        input: Option<Vec<u8>>,
         value: Uint256,
         create2_salt: Bytes32,
     ) -> Self {
@@ -137,13 +137,9 @@ impl ExecutionMessage {
             flags,
             depth,
             gas,
-            destination: destination.to_vec(),
-            sender: sender.to_vec(),
-            input: if let Some(input) = input {
-                Some(input.to_vec())
-            } else {
-                None
-            },
+            destination,
+            sender,
+            input,
             value,
             create2_salt,
         }
@@ -798,9 +794,9 @@ mod tests {
             44,
             66,
             4466,
-            &destination,
-            &sender,
-            Some(&input),
+            destination.clone(),
+            sender.clone(),
+            Some(input.clone()),
             value,
             create2_salt,
         );
@@ -1020,8 +1016,8 @@ mod tests {
             0,
             0,
             6566,
-            &test_addr,
-            &test_addr,
+            test_addr.clone(),
+            test_addr.clone(),
             None,
             Uint256::default(),
             Bytes32::default(),
@@ -1051,9 +1047,9 @@ mod tests {
             0,
             0,
             6566,
-            &test_addr,
-            &test_addr,
-            Some(&data),
+            test_addr.clone(),
+            test_addr.clone(),
+            Some(data.clone()),
             Uint256::default(),
             Bytes32::default(),
         );
