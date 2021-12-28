@@ -289,7 +289,7 @@ fn build_create_fn(names: &VMNameSet) -> proc_macro2::TokenStream {
     // Note: we can get CStrs unchecked because we did the checks on instantiation of VMMetaData.
     quote! {
         #[no_mangle]
-        pub extern "C" fn #fn_ident() -> *const ::evmc_vm::ffi::evmc_vm {
+        pub extern "C" fn #fn_ident() -> *mut ::evmc_vm::ffi::evmc_vm {
             let new_instance = ::evmc_vm::ffi::evmc_vm {
                 abi_version: ::evmc_vm::ffi::EVMC_ABI_VERSION as i32,
                 destroy: Some(__evmc_destroy),
