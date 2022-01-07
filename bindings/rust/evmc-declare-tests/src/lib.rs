@@ -21,7 +21,7 @@ impl EvmcVm for FooVM {
         &self,
         _revision: evmc_sys::evmc_revision,
         _code: &[u8],
-        _message: &ExecutionMessage,
+        _message: ExecutionMessage,
         _context: Option<&mut ExecutionContext>,
     ) -> ExecutionResult {
         ExecutionResult::success(1337, None)
