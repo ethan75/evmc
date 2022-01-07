@@ -82,7 +82,7 @@ mod tests {
             &self,
             _revision: evmc_sys::evmc_revision,
             _code: &[u8],
-            _message: &ExecutionMessage,
+            _message: ExecutionMessage,
             _context: Option<&mut ExecutionContext>,
         ) -> ExecutionResult {
             ExecutionResult::failure()
@@ -159,7 +159,7 @@ mod tests {
                 .execute(
                     evmc_sys::evmc_revision::EVMC_PETERSBURG,
                     &code,
-                    &message,
+                    message.clone(),
                     Some(&mut context)
                 )
                 .status_code(),
@@ -175,7 +175,7 @@ mod tests {
                 .execute(
                     evmc_sys::evmc_revision::EVMC_PETERSBURG,
                     &code,
-                    &message,
+                    message,
                     Some(&mut context)
                 )
                 .status_code(),

@@ -31,7 +31,7 @@ pub trait EvmcVm {
         &self,
         revision: Revision,
         code: &'a [u8],
-        message: &'a ExecutionMessage,
+        message: ExecutionMessage,
         context: Option<&'a mut ExecutionContext<'a>>,
     ) -> ExecutionResult;
 }

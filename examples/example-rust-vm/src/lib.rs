@@ -37,7 +37,7 @@ impl EvmcVm for ExampleRustVM {
         &self,
         _revision: Revision,
         _code: &'a [u8],
-        message: &'a ExecutionMessage,
+        message: ExecutionMessage,
         _context: Option<&'a mut ExecutionContext<'a>>,
     ) -> ExecutionResult {
         if _context.is_none() {
