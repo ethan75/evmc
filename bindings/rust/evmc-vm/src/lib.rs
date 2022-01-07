@@ -26,7 +26,7 @@ pub trait EvmcVm {
         revision: Revision,
         code: &'a [u8],
         message: ExecutionMessage,
-        context: Option<&'a mut ExecutionContext<'a>>,
+        context: ExecutionContext,
     ) -> ExecutionResult;
 }
 
@@ -62,8 +62,8 @@ pub type ExecutionHostContext = ffi::evmc_host_context;
 /// EVMC context structure. Exposes the EVMC host functions, message data, and transaction context
 /// to the executing VM.
 #[derive(Clone, Debug)]
-pub struct ExecutionContext<'a> {
-    host: &'a ffi::evmc_host_interface,
+pub struct ExecutionContext {
+    host: *const ffi::evmc_host_interface,
     context: *mut ExecutionHostContext,
     tx_context: ExecutionTxContext,
 }
@@ -201,15 +201,15 @@ impl ExecutionMessage {
     }
 }
 
-impl<'a> ExecutionContext<'a> {
-    pub fn new(host: &'a ffi::evmc_host_interface, _context: *mut ffi::evmc_host_context) -> Self {
+impl ExecutionContext {
+    pub fn new(host: *const ffi::evmc_host_interface, _context: *mut ffi::evmc_host_context) -> Self {
+        assert!(!host.is_null());
         let _tx_context = unsafe {
             assert!((*host).get_tx_context.is_some());
             (*host).get_tx_context.unwrap()(_context)
         };
-
         ExecutionContext {
-            host: host,
+            host,
             context: _context,
             tx_context: _tx_context,
         }
@@ -978,7 +978,7 @@ mod tests {
     fn execution_context() {
         let host_context = std::ptr::null_mut();
         let host_interface = get_dummy_host_interface();
-        let exe_context = ExecutionContext::new(&host_interface, host_context);
+        let exe_context = ExecutionContext::new(&mut host_interface, host_context);
         let a = exe_context.get_tx_context();
 
         let b = unsafe { get_dummy_tx_context(host_context) };
@@ -995,7 +995,7 @@ mod tests {
         let host = get_dummy_host_interface();
         let host_context = std::ptr::null_mut();
 
-        let mut exe_context = ExecutionContext::new(&host, host_context);
+        let mut exe_context = ExecutionContext::new(&mut host, host_context);
 
         let a: usize = 105023;
         let b = exe_context.get_code_size(&test_addr);
@@ -1009,7 +1009,7 @@ mod tests {
         let test_addr = vec![];
         let host = get_dummy_host_interface();
         let host_context = std::ptr::null_mut();
-        let mut exe_context = ExecutionContext::new(&host, host_context);
+        let mut exe_context = ExecutionContext::new(&mut host, host_context);
 
         let message = ExecutionMessage::new(
             MessageKind::EVMC_CALL,
@@ -1038,7 +1038,7 @@ mod tests {
         let test_addr = vec![];
         let host = get_dummy_host_interface();
         let host_context = std::ptr::null_mut();
-        let mut exe_context = ExecutionContext::new(&host, host_context);
+        let mut exe_context = ExecutionContext::new(&mut host, host_context);
 
         let data = vec![0xc0, 0xff, 0xfe];
 

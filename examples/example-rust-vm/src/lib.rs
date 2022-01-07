@@ -19,13 +19,8 @@ impl EvmcVm for ExampleRustVM {
         _revision: Revision,
         _code: &'a [u8],
         message: ExecutionMessage,
-        _context: Option<&'a mut ExecutionContext<'a>>,
+        _context: ExecutionContext,
     ) -> ExecutionResult {
-        if _context.is_none() {
-            return ExecutionResult::failure();
-        }
-        let _context = _context.unwrap();
-
         if message.kind() != MessageKind::EVMC_CALL {
             return ExecutionResult::failure();
         }
