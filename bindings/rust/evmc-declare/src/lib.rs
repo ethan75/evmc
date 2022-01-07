@@ -21,7 +21,7 @@
 //!             ExampleVM {}
 //!     }
 //!
-//!     fn execute(&self, revision: evmc_vm::ffi::evmc_revision, code: &[u8], message: evmc_vm::ExecutionMessage, context: Option<&mut evmc_vm::ExecutionContext>) -> evmc_vm::ExecutionResult {
+//!     fn execute(&self, revision: evmc_vm::ffi::evmc_revision, code: &[u8], message: evmc_vm::ExecutionMessage, context: evmc_vm::ExecutionContext) -> evmc_vm::ExecutionResult {
 //!             evmc_vm::ExecutionResult::success(1337, None)
 //!     }
 //! }
@@ -411,6 +411,7 @@ fn build_execute_fn(names: &VMNameSet) -> proc_macro2::TokenStream {
 
             assert!(!instance.is_null());
             assert!(!msg.is_null());
+            assert!(!host.is_null());
 
             let execution_message: ::evmc_vm::ExecutionMessage = unsafe {
                 msg.as_ref().expect("EVMC message is null").into()
@@ -432,17 +433,13 @@ fn build_execute_fn(names: &VMNameSet) -> proc_macro2::TokenStream {
             };
 
             let result = ::std::panic::catch_unwind(|| {
-                if host.is_null() {
-                    container.execute(revision, code_ref, execution_message, None)
-                } else {
-                    let mut execution_context = unsafe {
-                        ::evmc_vm::ExecutionContext::new(
-                            host.as_ref().expect("EVMC host is null"),
-                            context,
-                        )
-                    };
-                    container.execute(revision, code_ref, execution_message, Some(&mut execution_context))
-                }
+                let mut execution_context = unsafe {
+                    ::evmc_vm::ExecutionContext::new(
+                        host,
+                        context,
+                    )
+                };
+                container.execute(revision, code_ref, execution_message, execution_context)
             });
 
             let result = if result.is_err() {
