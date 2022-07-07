@@ -1,4 +1,4 @@
-﻿/**
+/**
  * EVMC: Ethereum Client-VM Connector API
  *
  * @copyright
@@ -1285,4 +1285,3 @@ struct evmc_vm* evmc_create_example_vm(void);
 #endif
 
 #endif
-/** @} */
