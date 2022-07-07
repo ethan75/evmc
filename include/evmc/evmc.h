@@ -1,14 +1,4 @@
-/**
- * EVMC: Ethereum Client-VM Connector API
- *
- * @copyright
- * Copyright 2016-2019 The EVMC Authors.
- * Licensed under the Apache License, Version 2.0.
- *
- * @defgroup EVMC EVMC
- * @{
- */
-#ifndef EVMC_H
+﻿#ifndef EVMC_H
 #define EVMC_H
 
 #if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 6)
@@ -1159,4 +1149,3 @@ struct evmc_vm* evmc_create_example_vm(void);
 #endif
 
 #endif
-/** @} */
