@@ -57,6 +57,7 @@ cable_configure_compiler(NO_STACK_PROTECTION)
 if(CABLE_COMPILER_GNULIKE)
     # TODO: Resolve issues or remove "result optional storage" and enable -Wcast-align.
     add_compile_options(-Wmissing-declarations)
+    add_compile_options(-fexceptions)
     cable_add_cxx_compiler_flag_if_supported(-Wfinal-dtor-non-final-class)
     cable_add_cxx_compiler_flag_if_supported(-Wnewline-eof)
     cable_add_cxx_compiler_flag_if_supported(-Wsuggest-destructor-override)

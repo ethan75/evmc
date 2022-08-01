@@ -444,7 +444,7 @@ public:
     virtual bool account_exists(const address& addr) const noexcept = 0;
 
     /// @copydoc evmc_host_interface::get_storage
-    virtual bytes32 get_storage(const address& addr, const bytes32& key) const noexcept = 0;
+    virtual bytes32 get_storage(const address& addr, const bytes32& key) const = 0;
 
     /// @copydoc evmc_host_interface::set_storage
     virtual evmc_storage_status set_storage(const address& addr,
@@ -464,7 +464,7 @@ public:
     virtual size_t copy_code(const address& addr,
                              size_t code_offset,
                              uint8_t* buffer_data,
-                             size_t buffer_size) const noexcept = 0;
+                             size_t buffer_size) const = 0;
 
     /// @copydoc evmc_host_interface::selfdestruct
     virtual void selfdestruct(const address& addr, const address& beneficiary) noexcept = 0;
@@ -518,7 +518,7 @@ public:
         return host->account_exists(context, &address);
     }
 
-    bytes32 get_storage(const address& address, const bytes32& key) const noexcept final
+    bytes32 get_storage(const address& address, const bytes32& key) const final
     {
         return host->get_storage(context, &address, &key);
     }
@@ -531,7 +531,7 @@ public:
     }
 
     virtual int32_t get(const uint8_t* _address, int32_t _addressLength, const uint8_t* _key, int32_t _keyLength,
-                uint8_t* _value, int32_t _valueLength) const noexcept final
+                uint8_t* _value, int32_t _valueLength) const final
     {
         return context->wasm_interface->get_storage(context, _address, _addressLength, _key, _keyLength, _value, _valueLength);
     }
@@ -560,7 +560,7 @@ public:
     size_t copy_code(const address& address,
                      size_t code_offset,
                      uint8_t* buffer_data,
-                     size_t buffer_size) const noexcept final
+                     size_t buffer_size) const final
     {
         return host->copy_code(context, &address, code_offset, buffer_data, buffer_size);
     }
