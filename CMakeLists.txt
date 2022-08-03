@@ -58,6 +58,7 @@ if(CABLE_COMPILER_GNULIKE)
     # TODO: Resolve issues or remove "result optional storage" and enable -Wcast-align.
     add_compile_options(-Wmissing-declarations)
     add_compile_options(-fexceptions)
+    set(CMAKE_C_FLAGS "-fexceptions ${CMAKE_C_FLAGS}")
     cable_add_cxx_compiler_flag_if_supported(-Wfinal-dtor-non-final-class)
     cable_add_cxx_compiler_flag_if_supported(-Wnewline-eof)
     cable_add_cxx_compiler_flag_if_supported(-Wsuggest-destructor-override)
