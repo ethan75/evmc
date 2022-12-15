@@ -130,6 +130,7 @@ struct evmc_message
      * Defined as `r` in the Yellow Paper.
      */
     evmc_address recipient;
+    // The recipient of the message for wasm
     const uint8_t* destination_ptr;
     int32_t destination_len;
 
@@ -142,6 +143,7 @@ struct evmc_message
      * At the depth 0 this must be the transaction origin.
      */
     evmc_address sender;
+    // The sender of the message for wasm
     const uint8_t* sender_ptr;
     int32_t sender_len;
 
